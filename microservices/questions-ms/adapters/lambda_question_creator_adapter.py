@@ -6,7 +6,6 @@ from typing import (
 )
 from http import HTTPStatus
 from datetime import datetime
-
 from hexagonal_polls.misc.adapters import AbstractQuestionCreatorIOFrameworkAdapter
 from hexagonal_polls.dtos import QuestionDTO
 

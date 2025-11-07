@@ -11,10 +11,10 @@ import uuid
 from hexagonal_polls.dtos import QuestionDTO 
 from hexagonal_polls.interfaces import IQuestionRepository
 
-from global_config.config import (
+from config import (
     DYNAMODB_ENDPOINT_URL, 
     QUESTION_TABLE_NAME, 
-    AWS_REGION
+    AWS_REGION,
 )
 
 
@@ -24,15 +24,13 @@ class DynamoDBQuestionRepository:
     Adaptador de salida que implementa el Puerto IQuestionRepository 
     para manejar operaciones de Preguntas con DynamoDB.
     """
-    def __init__(self):
+    def __init__(self, service=None):
         """
         Inicializa la conexión, requiriendo los parámetros de infraestructura.
         """
         endpoint_url = DYNAMODB_ENDPOINT_URL
         table_name = QUESTION_TABLE_NAME
         region_name = AWS_REGION
-
-
         self.table_name = table_name
         self.dynamo_client = boto3.resource(
             'dynamodb',

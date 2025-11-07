@@ -1,0 +1,54 @@
+# microservices/questions-ms/template.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Microservicio de Preguntas (questions-ms)
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Runtime: python3.13 
+    # Las variables de entorno para la infraestructura se inyectan aquí
+    Environment:
+      Variables:
+        # Se inyectarán los nombres de las tablas y regiones (importante para DynamoDBRepository)
+        QUESTION_TABLE_NAME: !Ref QuestionsTable # Referencia al nombre de la tabla creada abajo
+        AWS_REGION: !Ref AWS::Region
+        # DYNAMODB_ENDPOINT_URL solo se usará en LocalStack (ver notas)
+
+Resources:
+  # 1. Función Lambda para la creación de preguntas
+  CreateQuestionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.create_question_handler # Ruta al archivo y función
+      CodeUri: . # Ruta al código fuente (la raíz del proyecto)
+      Policies:
+        # Permiso para leer y escribir en la tabla de DynamoDB
+        - DynamoDBCrudPolicy:
+            TableName: !Ref QuestionsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /questions
+            Method: post
+
+  # 2. Función Lambda para la consulta de preguntas recientes
+  # (Se añadirán cuando implementemos el handler para GET /questions/recent)
+  
+  # 3. La Tabla de DynamoDB (Diseño de Tabla Única)
+  QuestionsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: PollsQuestionsTable # Nombre usado en global_config/config.py
+      PrimaryKey:
+        Name: pk
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      # ⚠️ Nota: Para consultas optimizadas, necesitarías un GSI aquí
+      # GlobalSecondaryIndexes:
+      #   - IndexName: GSI1-by-pub_date
+      #     ... (para el listado reciente)
