@@ -41,7 +41,7 @@ class DynamoDBQuestionRepository:
     
     # --- 1. COMANDO: CREAR UNA PREGUNTA ---
     
-    def create(self, question_text: str) -> QuestionDTO:
+    def create(self, question_dto: QuestionDTO) -> QuestionDTO:
         """
         Crea una nueva pregunta, generando un ID y la fecha de publicación.
         """
@@ -53,13 +53,11 @@ class DynamoDBQuestionRepository:
             'pk': f"QUESTION#{question_id}",
             'sk': f"INFO#{question_id}", 
             'question_id': question_id, # ID limpio para consultas internas
-            'question_text': question_text,
+            'question_text': question_dto.question_text,
             'pub_date': pub_date,
             'entity_type': 'QUESTION',
         }
-        
         self.table.put_item(Item=item)
-        
         # Mapeo: Convertir de DynamoDB a nuestro DTO
         return QuestionDTO(
             id=question_id, 

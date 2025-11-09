@@ -29,11 +29,6 @@ class LambdaQuestionCreatorAdapter(AbstractQuestionCreatorIOFrameworkAdapter):
             body = {} 
 
         question_text = body.get('question_text')
-        
-        if not question_text:
-            # Levantamos ValueError, que se asume será mapeado a 400 por el mecanismo de error.
-            raise ValueError("El campo 'question_text' es requerido.")
-            
         # Creamos un QuestionDTO, aunque solo se usen algunos campos
         return QuestionDTO(
             id=None, # ID nulo en la creación
@@ -52,7 +47,6 @@ class LambdaQuestionCreatorAdapter(AbstractQuestionCreatorIOFrameworkAdapter):
             # Aseguramos la serialización correcta de datetime
             'pub_date': question.pub_date.isoformat() if question.pub_date else None
         }
-
         # Estructura de respuesta de AWS Lambda/API Gateway
         return {
             'statusCode': HTTPStatus.CREATED.value,
